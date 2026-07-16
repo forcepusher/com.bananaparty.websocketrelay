@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using UnityEngine;
 
-namespace BananaParty.WebSocketClient.Tests
+namespace BananaParty.WebSocketRelay.Tests
 {
     public class WaitWhile : CustomYieldInstruction
     {
@@ -24,7 +24,7 @@ namespace BananaParty.WebSocketClient.Tests
                 if (!_stopwatch.IsRunning)
                     _stopwatch.Start();
 
-                return _conditionFunc.Invoke() && _stopwatch.Elapsed.Seconds < _timeoutThreshold;
+                return _conditionFunc.Invoke() && _stopwatch.Elapsed.TotalSeconds < _timeoutThreshold;
             }
         }
 
