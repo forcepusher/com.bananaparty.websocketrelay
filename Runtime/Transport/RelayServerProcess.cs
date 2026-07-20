@@ -97,24 +97,32 @@ namespace BananaParty.WebSocketRelay.Transport
 
         private static void KillAllWindows()
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo
-            {
-                FileName = "wmic",
-                Arguments = $"process where \"name='bun.exe' and CommandLine like '%{ProcessMarker}%'\" call terminate",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-            };
+            string embeddedBunPath = Path.GetFullPath(GetBunPath(GetServerDirectory()));
 
-            using Process process = Process.Start(startInfo);
-            process?.WaitForExit(5000);
+            foreach (Process process in Process.GetProcessesByName("bun"))
+            {
+                using (process)
+                {
+                    if (process.HasExited)
+                        continue;
+
+                    if (!Path.GetFullPath(process.MainModule.FileName).Equals(embeddedBunPath, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    process.Kill();
+                    process.WaitForExit(5000);
+                }
+            }
         }
 
         private static void KillAllUnix()
         {
+            string embeddedBunPath = Path.GetFullPath(GetBunPath(GetServerDirectory()));
+
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = "pkill",
-                Arguments = $"-f Source/index.ts {ProcessMarker}",
+                Arguments = $"-f \"{embeddedBunPath}.*{ProcessMarker}\"",
                 CreateNoWindow = true,
                 UseShellExecute = false,
             };
