@@ -1,3 +1,4 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
 using System.Runtime.InteropServices;
 
 namespace BananaParty.WebSocketRelay
@@ -68,3 +69,4 @@ namespace BananaParty.WebSocketRelay
         }
     }
 }
+#endif
