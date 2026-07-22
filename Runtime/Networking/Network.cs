@@ -8,6 +8,7 @@ namespace BananaParty.WebSocketRelay
     {
         private readonly NetworkContext _networkContext;
         private readonly string _serverAddress;
+        private readonly bool _offlineMode;
 
         private RelayServerProcess _relayServerProcess;
         private RelayClient _relayClient;
@@ -15,14 +16,19 @@ namespace BananaParty.WebSocketRelay
         public bool IsConnected => _relayClient != null && _relayClient.IsConnected;
         public bool HasRelayClient => _relayClient != null;
 
-        public Network(string address, NetworkContext context)
+        public Network(string address, NetworkContext context, bool offlineMode = false)
         {
             _serverAddress = address;
             _networkContext = context;
+            _offlineMode = offlineMode;
         }
 
         public void StartServer()
         {
+            // Offline mode has no relay server to launch.
+            if (_offlineMode)
+                return;
+
             if (_relayServerProcess != null)
                 throw new InvalidOperationException("Server already running");
 
@@ -32,6 +38,9 @@ namespace BananaParty.WebSocketRelay
 
         public void StopServer()
         {
+            if (_offlineMode)
+                return;
+
             if (_relayServerProcess == null)
                 throw new InvalidOperationException("Server not started to stop it");
 
@@ -47,9 +56,11 @@ namespace BananaParty.WebSocketRelay
 
             _networkContext.LocalClientIdentity = clientGuid;
 
-            _relayClient = new RelayClient(_serverAddress, this, clientGuid);
+            _relayClient = new RelayClient(_serverAddress, this, clientGuid, _offlineMode);
             _relayClient.Connect();
-            Debug.Log($"Connecting to relay server at {_serverAddress}");
+            Debug.Log(_offlineMode
+                ? "Started offline mode session"
+                : $"Connecting to relay server at {_serverAddress}");
         }
 
         public void Disconnect()

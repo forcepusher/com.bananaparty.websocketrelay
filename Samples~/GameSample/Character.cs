@@ -51,11 +51,6 @@ namespace BananaParty.WebSocketRelay.Samples
 
             if (!_networkIdentity.NetworkAuthority)
             {
-                //if (GetComponent<BotCharacterInput>())
-                //{
-                //    Debug.Log("HELLOOO???");
-                //}
-
                 _health = health;
                 _position = position;
                 transform.position = position;

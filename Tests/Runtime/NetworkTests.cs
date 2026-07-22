@@ -29,6 +29,51 @@ namespace BananaParty.WebSocketRelay.Tests
         }
 
         [UnityTest]
+        public IEnumerator OfflineMode_FullSessionLifecycleWorksWithoutRelayServer()
+        {
+            NetworkContext context = NetworkContextTestHelpers.CreateContext();
+            Guid clientGuid = Guid.NewGuid();
+            Network network = new Network("ws://unreachable-address", context, offlineMode: true);
+
+            network.StartServer();
+            network.Connect(clientGuid);
+
+            Assert.IsTrue(network.IsConnected);
+            Assert.AreEqual(clientGuid, context.LocalClientIdentity);
+
+            network.SubscribeToChannel("room");
+
+            StubNetworkIdentity identity = new(
+                new GameObject("OfflineOwnedObject"),
+                "OfflinePrefab",
+                clientGuid,
+                Guid.NewGuid(),
+                channel: "room");
+            context.RegisterNetworkIdentity(identity);
+            StubRpcTarget rpcTarget = new(identity, "TestRpc");
+            context.RegisterRpcTarget(rpcTarget);
+
+            context.SendRpc(identity.NetworkIdentifier, "TestRpc", NetworkContextTestHelpers.CreateRpcParameters(42), "room");
+            network.SendSyncIdentities();
+            network.ManualUpdate(Time.deltaTime);
+            yield return null;
+            network.ManualUpdate(Time.deltaTime);
+
+            Assert.IsTrue(network.IsConnected);
+            Assert.AreEqual(1, rpcTarget.ReceiveCount);
+            Assert.AreEqual(42, rpcTarget.LastReceivedValue);
+            Assert.IsFalse(context.TryDequeueOutgoingRpcMessage(out _, out _));
+
+            network.StopServer();
+            network.Disconnect();
+
+            Assert.IsFalse(network.HasRelayClient);
+            Assert.AreEqual(Guid.Empty, context.LocalClientIdentity);
+
+            UnityEngine.Object.DestroyImmediate(context);
+        }
+
+        [UnityTest]
         public IEnumerator ConnectTimeout_DisconnectAllowsReconnect()
         {
             NetworkContext context = NetworkContextTestHelpers.CreateContext();

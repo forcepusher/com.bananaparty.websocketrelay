@@ -67,19 +67,37 @@ namespace BananaParty.WebSocketRelay.Tests
                         "Failed to start bun test process.");
                 }
 
-                string standardOutput = process.StandardOutput.ReadToEnd();
-                string standardError = process.StandardError.ReadToEnd();
+                // Read stdout/stderr concurrently. Sequential ReadToEnd deadlocks when either
+                // pipe fills, and WaitForExit never runs so the timeout cannot recover.
+                StringBuilder standardOutput = new();
+                StringBuilder standardError = new();
+                process.OutputDataReceived += (_, args) =>
+                {
+                    if (args.Data != null)
+                        standardOutput.AppendLine(args.Data);
+                };
+                process.ErrorDataReceived += (_, args) =>
+                {
+                    if (args.Data != null)
+                        standardError.AppendLine(args.Data);
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
                 if (!process.WaitForExit(RunTimeoutMs))
                 {
                     process.Kill();
+                    process.WaitForExit();
                     return new BunTestRunReport(
                         Array.Empty<BunTestCaseResult>(),
                         -1,
-                        standardOutput,
-                        standardError,
+                        standardOutput.ToString(),
+                        standardError.ToString(),
                         $"Bun test process timed out after {RunTimeoutMs}ms.");
                 }
+
+                // Second WaitForExit drains async output handlers after exit.
+                process.WaitForExit();
 
                 IReadOnlyList<BunTestCaseResult> cases = File.Exists(junitReportPath)
                     ? ParseJUnitReport(junitReportPath)
@@ -88,8 +106,8 @@ namespace BananaParty.WebSocketRelay.Tests
                 return new BunTestRunReport(
                     cases,
                     process.ExitCode,
-                    standardOutput,
-                    standardError,
+                    standardOutput.ToString(),
+                    standardError.ToString(),
                     null);
             }
             finally

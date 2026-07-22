@@ -1,6 +1,6 @@
 {
   "name": "com.bananaparty.websocketrelay",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "displayName": "WebSocket Relay",
   "unity": "6000.3",
   "description": "Fully cross-platform websocket client and relay server.",

@@ -6,7 +6,7 @@ namespace BananaParty.WebSocketRelay.Transport
 {
     public class RelayClient : IDisposable
     {
-        private readonly Socket _socket;
+        private readonly ISocket _socket;
         private readonly IRelayListener _relayListener;
 
         private bool _wasConnected;
@@ -17,10 +17,10 @@ namespace BananaParty.WebSocketRelay.Transport
 
         public bool IsConnected => _socket.IsConnected;
 
-        public RelayClient(string serverAddress, IRelayListener relayListener, Guid clientGuid)
+        public RelayClient(string serverAddress, IRelayListener relayListener, Guid clientGuid, bool offlineMode = false)
         {
             ClientGuid = clientGuid;
-            _socket = new Socket(serverAddress);
+            _socket = offlineMode ? new OfflineSocket() : new Socket(serverAddress);
             _relayListener = relayListener;
         }
 
