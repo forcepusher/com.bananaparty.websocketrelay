@@ -166,6 +166,7 @@ MonoBehaviour:
   _networkContext: {fileID: 11400000, guid: 3892ff3e93f930c4082ae22a3252b126, type: 2}
   _prefabName: BotCharacter
   _distanceBasedAuthority: 1
+  _destroyWhenAuthorityOwnerLeaves: 0
 --- !u!114 &807091886373491606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +180,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BananaParty.WebSocketRelay::BananaParty.WebSocketRelay.NetworkBinding
   _networkChannel: {fileID: 11400000, guid: 4031f307a119f414aa736f59d43f4f9e, type: 2}
-  _networkContext: {fileID: 11400000, guid: 3892ff3e93f930c4082ae22a3252b126, type: 2}
   _guid: 8e18e9b4-619b-43ed-976b-18765d6465da
 --- !u!33 &5702266865057829643
 MeshFilter:

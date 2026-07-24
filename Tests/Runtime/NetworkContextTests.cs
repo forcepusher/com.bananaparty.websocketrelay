@@ -62,6 +62,37 @@ namespace BananaParty.WebSocketRelay.Tests
         }
 
         [UnityTest]
+        public IEnumerator TimedOutPlayer_KeepsIdentitiesWhenDestroyWhenAuthorityOwnerLeavesIsFalse()
+        {
+            NetworkContext context = NetworkContextTestHelpers.CreateContext(playerTimeoutSeconds: 1f);
+            context.LocalClientIdentity = Guid.NewGuid();
+            Guid remotePlayer = Guid.NewGuid();
+
+            context.ProcessChannelMessage(remotePlayer, "room", NetworkContextTestHelpers.CreateEmptySyncIdentitiesMessage());
+
+            GameObject remoteObject = new("PersistentOwnedObject");
+            StubNetworkIdentity remoteIdentity = new(
+                remoteObject,
+                "RemotePrefab",
+                remotePlayer,
+                Guid.NewGuid())
+            {
+                DestroyWhenAuthorityOwnerLeaves = false
+            };
+            context.RegisterNetworkIdentity(remoteIdentity);
+
+            context.ManualUpdate(1.1f);
+            yield return null;
+
+            Assert.AreEqual(0, NetworkContextTestHelpers.GetNetworkPlayerCount(context));
+            Assert.AreEqual(1, NetworkContextTestHelpers.GetNetworkIdentityCount(context));
+            Assert.IsFalse(remoteObject == null);
+
+            UnityEngine.Object.DestroyImmediate(remoteObject);
+            UnityEngine.Object.DestroyImmediate(context);
+        }
+
+        [UnityTest]
         public IEnumerator TimedOutPlayer_DoesNotRemoveOtherPlayersIdentities()
         {
             NetworkContext context = NetworkContextTestHelpers.CreateContext(playerTimeoutSeconds: 2f);

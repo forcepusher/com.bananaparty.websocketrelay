@@ -5,15 +5,20 @@ Unity package. Fully cross-platform and portable WebSocket client and relay serv
 Make sure you have standalone [Git](https://git-scm.com/downloads) installed first. Reboot after installation.  
 In Unity, open "Window" -> "Package Manager".  
 Click the "+" sign at the top left corner -> "Add package from git URL..."  
-Paste this: `https://github.com/forcepusher/com.bananaparty.websocketrelay.git#2.1.0`  
+Paste this: `https://github.com/forcepusher/com.bananaparty.websocketrelay.git#2.1.1`  
 To update the package, simply add it again using a different version tag.  
 See minimum required Unity version in the `package.json` file.  
   
 ---  
   
 Networking as simple as it gets (for programmers though).  
-It's basically a peer-to-peer networking through a relay server.  
-The goal is to provide bare minimum to get things done and to ship the game ASAP.  
+It's basically a peer-to-peer networking through a relay server, with wss:// support out of the box.  
+The goal is to provide bare minimum to get things done while owning the entire backend stack.  
+  
+Key differences from Photon PUN:
+1. No master client. Authority is either based on distance to the target or claimed manually.  
+2. You host your own relay server and have full control of everything. I host mine on personal home server.  
+3. It's based on [Bun's pub/sub](https://bun.com/docs/guides/websocket/pubsub) messaging channels, not rooms. You can subscribe to multiple channels.  
   
 Key priorities:  
 1. Developer Experience - JSON data stream for developing. Binary stream for shipping.  

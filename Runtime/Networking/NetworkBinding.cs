@@ -8,8 +8,6 @@ namespace BananaParty.WebSocketRelay
         [SerializeField]
         private NetworkChannel _networkChannel;
         [SerializeField]
-        private NetworkContext _networkContext;
-        [SerializeField]
         private string _guid;
 
         private NetworkIdentity _networkIdentity;
@@ -23,13 +21,13 @@ namespace BananaParty.WebSocketRelay
         private void OnEnable()
         {
             _networkChannel.AddBinding(this);
-            _networkContext.RegisterNetworkIdentity(_networkIdentity);
+            _networkIdentity.NetworkContext.RegisterNetworkIdentity(_networkIdentity);
         }
 
         private void OnDisable()
         {
             _networkChannel.RemoveBinding(this);
-            _networkContext.UnregisterNetworkIdentity(_networkIdentity);
+            _networkIdentity.NetworkContext.UnregisterNetworkIdentity(_networkIdentity);
         }
 
         public void SetBinding(string channel)

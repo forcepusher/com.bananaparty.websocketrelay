@@ -55,6 +55,7 @@ MonoBehaviour:
   _networkContext: {fileID: 11400000, guid: 3892ff3e93f930c4082ae22a3252b126, type: 2}
   _prefabName: PlayerCharacter
   _distanceBasedAuthority: 0
+  _destroyWhenAuthorityOwnerLeaves: 1
 --- !u!114 &916078405900279995
 MonoBehaviour:
   m_ObjectHideFlags: 0

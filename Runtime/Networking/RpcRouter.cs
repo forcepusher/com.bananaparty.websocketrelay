@@ -11,7 +11,7 @@ namespace BananaParty.WebSocketRelay
         private const int HeaderSize = SubjectNameOffset + 16;
 
         private readonly IStateFormat _stateFormat;
-        private readonly Dictionary<Guid, List<IRpcTarget>> _targetsByIdentity = new();
+        private readonly List<IRpcTarget> _rpcTargets = new();
         private readonly Queue<(string channel, byte[] message)> _outgoingMessages = new();
 
         public RpcRouter(IStateFormat stateFormat)
@@ -21,26 +21,12 @@ namespace BananaParty.WebSocketRelay
 
         public void RegisterTarget(IRpcTarget rpcTarget)
         {
-            Guid networkIdentifier = rpcTarget.NetworkIdentity.NetworkIdentifier;
-            if (!_targetsByIdentity.TryGetValue(networkIdentifier, out List<IRpcTarget> rpcTargets))
-            {
-                rpcTargets = new List<IRpcTarget>();
-                _targetsByIdentity[networkIdentifier] = rpcTargets;
-            }
-
-            rpcTargets.Add(rpcTarget);
+            _rpcTargets.Add(rpcTarget);
         }
 
         public void UnregisterTarget(IRpcTarget rpcTarget)
         {
-            Guid networkIdentifier = rpcTarget.NetworkIdentity.NetworkIdentifier;
-            if (!_targetsByIdentity.TryGetValue(networkIdentifier, out List<IRpcTarget> rpcTargets))
-                return;
-
-            rpcTargets.Remove(rpcTarget);
-
-            if (rpcTargets.Count == 0)
-                _targetsByIdentity.Remove(networkIdentifier);
+            _rpcTargets.Remove(rpcTarget);
         }
 
         public void Send(Guid networkIdentifier, string rpcSubjectName, IStateOutput parametersStateOutput, string channel, bool invokeLocally = true)
@@ -97,11 +83,16 @@ namespace BananaParty.WebSocketRelay
 
         private void Dispatch(Guid networkIdentifier, string rpcSubjectName, byte[] parametersPayload)
         {
-            if (!_targetsByIdentity.TryGetValue(networkIdentifier, out List<IRpcTarget> rpcTargets))
-                return;
-
-            foreach (IRpcTarget rpcTarget in rpcTargets)
+            // The identifier is matched at dispatch time instead of being indexed at
+            // registration time, because a target can register before its identifier
+            // is assigned. Unity interleaves Awake/OnEnable across components during
+            // scene load, so a component's OnEnable registration can run before
+            // NetworkBinding.Awake assigns the identity's NetworkIdentifier.
+            foreach (IRpcTarget rpcTarget in _rpcTargets)
             {
+                if (rpcTarget.NetworkIdentity.NetworkIdentifier != networkIdentifier)
+                    continue;
+
                 if (rpcTarget.RpcSubjectName != rpcSubjectName)
                     continue;
 

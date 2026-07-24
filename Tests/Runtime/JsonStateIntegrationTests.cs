@@ -101,9 +101,11 @@ namespace BananaParty.WebSocketRelay.Tests
             public string PrefabName => nameof(MockGameState);
             public string Channel { get; set; }
             public Guid NetworkIdentifier { get; set; } = Guid.NewGuid();
-            public Guid NetworkOwner { get; set; } = Guid.NewGuid();
+            public Guid NetworkAuthorityOwner { get; set; } = Guid.NewGuid();
             public bool NetworkAuthority { get; set; }
+            public bool HasAuthorityOwner => NetworkAuthorityOwner != Guid.Empty;
             public bool DistanceBasedAuthority { get; set; } = false;
+            public bool DestroyWhenAuthorityOwnerLeaves { get; set; } = true;
 
             public NetworkContext NetworkContext => throw new NotImplementedException();
             public int PlayTime { get; set; }
@@ -131,6 +133,8 @@ namespace BananaParty.WebSocketRelay.Tests
             }
 
             public void SendRpc(string rpcSubjectName, IStateOutput parametersStateOutput, bool invokeLocally = true) => throw new NotImplementedException();
+
+            public void ClaimAuthority() => throw new NotImplementedException();
         }
     }
 }
