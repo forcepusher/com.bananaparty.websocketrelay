@@ -25,9 +25,6 @@ Key priorities:
 2. Portable & Cheap - Relay server runtime embedded in Unity package. No expensive setups, doubleclick-ready.  
 3. Tests & Stability - Integration tests using the portable runtime for quick QA. Especially valuable for AI slop.  
   
-Architecture is stupid-simple. It's a just a pub/sub, where each channel can represent a room or an area.  
-You can even build a seamless world if you listen to 4 channels, where each channel represents an area.  
-  
 Future plans:  
 1. Sample projects to use as a template for kickstarting development of your games.  
 2. Unity Instance Dedicated Server. Unity spins up a relay server and connects to it as a client to act as a server.  
