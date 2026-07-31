@@ -63,12 +63,14 @@ namespace BananaParty.WebSocketRelay
                 : $"Connecting to relay server at {_serverAddress}");
         }
 
-        public void Disconnect()
+        public void Disconnect(bool clearSession = true)
         {
             if (_relayClient == null)
                 throw new InvalidOperationException("Not connected to disconnect");
 
-            _networkContext.ClearNetworkSession();
+            if (clearSession)
+                _networkContext.ClearNetworkSession();
+
             _relayClient.Dispose();
             _relayClient = null;
         }

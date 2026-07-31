@@ -104,6 +104,37 @@ namespace BananaParty.WebSocketRelay.Tests
         }
 
         [UnityTest]
+        public IEnumerator Disconnect_ClearSessionFalse_PreservesNetworkIdentities()
+        {
+            NetworkContext context = NetworkContextTestHelpers.CreateContext();
+            Guid clientGuid = Guid.NewGuid();
+            Network network = new Network("ws://127.0.0.1:1", context);
+
+            network.Connect(clientGuid);
+
+            GameObject sceneObject = new("SceneNetworkedObject");
+            context.RegisterNetworkIdentity(new StubNetworkIdentity(
+                sceneObject,
+                "ScenePrefab",
+                clientGuid,
+                Guid.NewGuid()));
+
+            yield return TestParameters.WaitForDuration(1f, () => network.ManualUpdate(Time.deltaTime));
+
+            Assert.IsFalse(network.IsConnected);
+            Assert.IsTrue(network.HasRelayClient);
+
+            network.Disconnect(clearSession: false);
+
+            Assert.IsFalse(network.HasRelayClient);
+            Assert.AreEqual(1, NetworkContextTestHelpers.GetNetworkIdentityCount(context));
+            Assert.IsFalse(sceneObject == null);
+
+            UnityEngine.Object.DestroyImmediate(sceneObject);
+            UnityEngine.Object.DestroyImmediate(context);
+        }
+
+        [UnityTest]
         public IEnumerator ServerStop_ManualUpdateClearsSessionAndAllowsReconnect()
         {
             NetworkContext context = NetworkContextTestHelpers.CreateContext();
