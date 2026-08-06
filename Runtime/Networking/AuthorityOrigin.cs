@@ -5,7 +5,9 @@ namespace BananaParty.WebSocketRelay
 {
     public class AuthorityOrigin : MonoBehaviour, IAuthorityOrigin
     {
-        private const float AuthorityInterceptionThreshold = 0.5f;
+        [SerializeField]
+        [Range(0.1f, 0.9f)]
+        private float _authorityInterceptionDistanceThreshold = 0.5f;
 
         [SerializeField]
         private NetworkContext _networkContext;
@@ -54,7 +56,7 @@ namespace BananaParty.WebSocketRelay
                 float currentAuthorityOwnerDistance = Vector3.Distance(networkIdentity.GameObject.transform.position, currentAuthorityOwnerOrigin.Position);
                 float localDistance = Vector3.Distance(networkIdentity.GameObject.transform.position, Position);
 
-                if (localDistance > currentAuthorityOwnerDistance * AuthorityInterceptionThreshold)
+                if (localDistance > currentAuthorityOwnerDistance * _authorityInterceptionDistanceThreshold)
                     continue;
 
                 networkIdentity.ClaimAuthority();

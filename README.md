@@ -5,7 +5,7 @@ Unity package. Fully cross-platform and portable WebSocket client and relay serv
 Make sure you have standalone [Git](https://git-scm.com/downloads) installed first. Reboot after installation.  
 In Unity, open "Window" -> "Package Manager".  
 Click the "+" sign at the top left corner -> "Add package from git URL..."  
-Paste this: `https://github.com/forcepusher/com.bananaparty.websocketrelay.git#2.1.2`  
+Paste this: `https://github.com/forcepusher/com.bananaparty.websocketrelay.git#2.2.0`  
 To update the package, simply add it again using a different version tag.  
 See minimum required Unity version in the `package.json` file.  
   
@@ -26,7 +26,7 @@ Key priorities:
 3. Tests & Stability - Integration tests using the portable runtime for quick QA. Especially valuable for AI slop.  
   
 Future plans:  
-1. Sample projects to use as a template for kickstarting development of your games.  
+1. Keep adding features and maintaining it. I don't have a choice coz I need a free Photon on a job and pet projects.  
 2. Unity Instance Dedicated Server. Unity spins up a relay server and connects to it as a client to act as a server.  
 3. UDP support via HTTP/3 QUIC. At this point it's going to be just as efficient as any other non-web network library.  
   
